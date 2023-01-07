@@ -30,5 +30,7 @@ router.post('/checkuser', Controller.login_user)
 // route to get details of the products based on id
 router.get('/get-product-details/:id', Controller.getDetails)
 router.get('/getuser/:email', Controller.getuser)
+// search router
+router.get('/search/:search', Controller.search)
 
 export default router

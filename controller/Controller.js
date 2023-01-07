@@ -12,6 +12,7 @@ class Controller {
     static createaccount = async (req, res) => {
         try {
             console.log(req.body)
+
             //    getting data from user
             const { name, email, password } = req.body
 
@@ -34,7 +35,7 @@ class Controller {
                         password
                     })
                     if (await insert.save()) {
-                        res.status(200).send('Congratulation account created')
+                        res.send('Congratulation account created')
                     }
                 }
 
@@ -53,16 +54,45 @@ class Controller {
         res.send(allproducts)
     }
 
+    // search funtionality
 
+
+    static search = async (req, res) => {
+        try {
+            const word = req.params.search
+            console.log(word)
+            const find = await Product__Model.find({
+
+
+                "$or": [
+                    { name: { $regex: word } },
+                    { categories: { $regex: word } },
+                    { description: { $regex: word } },
+                    { district: { $regex: word } },
+                ]
+            })
+            if (find) {
+                res.send(find)
+            }
+            console.log(find)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    // search
     // functin for login 
 
     static login = async (req, res) => {
         try {
             const { email, password } = req.body
+            console.log(req.body)
             // check the fileds
             if (!(email && password)) {
-                res.send("Enter all the fields")
+                console.log('Enter all fields')
+                res.send({ login_err: "Enter all fields..." })
             }
+
             else {
 
                 // check if email exist or not with password
@@ -76,7 +106,7 @@ class Controller {
                     res.send(user)
                 }
                 else {
-                    res.send('No email account with this email')
+                    res.send({ login_err: "Please enter correct details" })
                 }
 
             }
@@ -95,9 +125,12 @@ class Controller {
     static Sell = async (req, res, next) => {
         try {
             // getting the data from user
-
-            console.log(req.body)
-
+            const { name, price, ward, categories, district, email } = req.body
+            // checking all fields are entered or not
+            const filename = req.file.filename
+            if (!(name && price && district && categories && email && ward && filename)) {
+                res.send({ result: 'All fields are required ? ' })
+            }
             const upload = await new Product__Model({
                 name: req.body.name,
                 price: req.body.price,
@@ -125,10 +158,10 @@ class Controller {
             })
             const save = await upload.save()
             if (save) {
-                console.log('uploaded')
+                res.send({ result: "Thanks...You are selling the products.." })
             }
             else {
-                console.log("not uploaded")
+                console.log({ result: 'Sorry ! Something went bad!' })
             }
         } catch (error) {
             console.log(error)
